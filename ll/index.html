@@ -3,244 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>启动 Launcher</title>
+    <title>qlauncher</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        
-        .app-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, #007acc, #00a8ff);
-            border-radius: 20px;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-        
-        .description {
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.5;
         }
         
         .launch-button {
-            background: linear-gradient(45deg, #007acc, #00a8ff);
+            padding: 20px 40px;
+            font-size: 18px;
+            font-weight: 500;
             color: white;
+            background-color: #007acc;
             border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 50px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 122, 204, 0.3);
-            width: 100%;
-            margin-bottom: 15px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 122, 204, 0.2);
         }
         
         .launch-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 122, 204, 0.4);
+            background-color: #005a9e;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
         }
         
         .launch-button:active {
             transform: translateY(0);
-        }
-        
-        .fallback-link {
-            color: #007acc;
-            text-decoration: none;
-            font-size: 14px;
-            display: block;
-            margin-top: 10px;
-        }
-        
-        .fallback-link:hover {
-            text-decoration: underline;
-        }
-        
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            display: none;
-        }
-        
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            display: block;
-        }
-        
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            display: block;
-        }
-        
-        .instructions {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: left;
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .instructions h3 {
-            margin-bottom: 8px;
-            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 122, 204, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="app-icon">QL</div>
-        <h1>启动 Launcher</h1>
-        <p class="description">点击下方按钮启动应用程序</p>
-        
-        <button class="launch-button" onclick="launchApp()">
-            启动应用
-        </button>
-        
-        <a href="#" class="fallback-link" onclick="openFallback()">无法启动？前往下载页面</a>
-        
-        <div id="status" class="status"></div>
-        
-        <div class="instructions">
-            <h3>使用说明：</h3>
-            <p>• 首次使用可能需要授权应用启动</p>
-            <p>• 确保已安装最新版本的应用</p>
-            <p>• 如无法启动，请检查应用是否已正确安装</p>
-        </div>
-    </div>
-
-    <script>
-        function launchApp() {
-            const statusEl = document.getElementById('status');
-            statusEl.className = 'status';
-            
-            // 记录启动时间
-            const startTime = Date.now();
-            let appLaunched = false;
-            
-            // 尝试通过自定义协议启动
-            try {
-                // 主要启动方式：自定义协议
-                window.location.href = 'qlauncher://open';
-                appLaunched = true;
-            } catch (e) {
-                console.error('协议启动失败:', e);
-            }
-            
-            // 备用启动方式：Android Intent
-            setTimeout(() => {
-                try {
-                    window.location.href = `intent://open/#Intent;scheme=qlauncher;package=com.threethan.launcher;end`;
-                    appLaunched = true;
-                } catch (e) {
-                    console.error('Intent启动失败:', e);
-                }
-            }, 100);
-            
-            // 检测是否成功启动
-            setTimeout(() => {
-                const timeElapsed = Date.now() - startTime;
-                
-                // 如果页面仍然可见，说明启动可能失败
-                if (!document.hidden && timeElapsed > 2000) {
-                    statusEl.textContent = '启动失败，请确保应用已安装';
-                    statusEl.className = 'status error';
-                    
-                    // 显示备用选项
-                    setTimeout(() => {
-                        if (confirm('无法启动应用，是否前往下载页面？')) {
-                            openFallback();
-                        }
-                    }, 500);
-                } else if (appLaunched) {
-                    statusEl.textContent = '正在启动应用...';
-                    statusEl.className = 'status success';
-                    
-                    // 可选：自动关闭页面
-                    setTimeout(() => {
-                        window.close();
-                    }, 1000);
-                }
-            }, 1500);
-        }
-        
-        function openFallback() {
-            // 根据平台跳转到相应的下载页面
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            
-            // 检测Android
-            if (/android/i.test(userAgent)) {
-                window.location.href = 'https://play.google.com/store/apps/details?id=com.threethan.launcher';
-            }
-            // 检测iOS
-            else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                window.location.href = 'https://apps.apple.com/app/com-threethan-launcher';
-            }
-            // 默认跳转到Google Play
-            else {
-                window.location.href = 'https://play.google.com/store/apps/details?id=com.threethan.launcher';
-            }
-        }
-        
-        // 页面可见性检测
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                // 页面被隐藏，可能已成功启动App
-                const statusEl = document.getElementById('status');
-                statusEl.textContent = '应用启动成功！';
-                statusEl.className = 'status success';
-            }
-        });
-        
-        // 自动尝试启动（可选）
-        // window.onload = function() {
-        //     // 如果是从特定来源访问，自动尝试启动
-        //     if (document.referrer.includes('your-domain.com')) {
-        //         setTimeout(launchApp, 1000);
-        //     }
-        // };
-    </script>
+    <button class="launch-button">
+        启动应用
+    </button>
 </body>
+<script>
+    document.querySelector('.launch-button').addEventListener('click', function() {
+        window.location.href = 'lightninglauncher://open';
+        window.close();
+    });
+</script>
 </html>
