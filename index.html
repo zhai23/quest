@@ -40,23 +40,162 @@
             transform: translateY(0);
             box-shadow: 0 2px 4px rgba(0, 122, 204, 0.2);
         }
+        
+        .settings-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 250px;
+            z-index: 1000;
+        }
+        
+        .settings-panel h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .setting-item {
+            margin-bottom: 15px;
+        }
+        
+        .setting-item label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .setting-item input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .settings-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1001;
+        }
+        
+        .settings-toggle:hover {
+            background: #005a9e;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .save-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        .save-button:hover {
+            background: #218838;
+        }
     </style>
 </head>
 <body>
     <button class="launch-button">
         启动应用
     </button>
+    
+    <button class="settings-toggle" onclick="toggleSettings()">
+        设置
+    </button>
+    
+    <div class="settings-panel hidden" id="settingsPanel">
+        <h3>启动设置</h3>
+        <div class="setting-item">
+            <label for="delayTime">自动启动延迟时间 (毫秒):</label>
+            <input type="number" id="delayTime" min="0" max="10000" step="100" value="500">
+        </div>
+        <div class="setting-item">
+            <label for="autoLaunch">启用自动启动:</label>
+            <input type="checkbox" id="autoLaunch" checked>
+        </div>
+        <button class="save-button" onclick="saveSettings()">保存设置</button>
+    </div>
 </body>
 <script>
+    // 默认设置
+    let settings = {
+        delayTime: 500,
+        autoLaunch: true
+    };
+    
+    // 从 localStorage 加载设置
+    function loadSettings() {
+        const savedSettings = localStorage.getItem('lightningLauncherSettings');
+        if (savedSettings) {
+            settings = JSON.parse(savedSettings);
+            document.getElementById('delayTime').value = settings.delayTime;
+            document.getElementById('autoLaunch').checked = settings.autoLaunch;
+        }
+    }
+    
+    // 保存设置到 localStorage
+    function saveSettings() {
+        settings.delayTime = parseInt(document.getElementById('delayTime').value);
+        settings.autoLaunch = document.getElementById('autoLaunch').checked;
+        localStorage.setItem('lightningLauncherSettings', JSON.stringify(settings));
+        
+        // 显示保存成功提示
+        const saveButton = document.querySelector('.save-button');
+        const originalText = saveButton.textContent;
+        saveButton.textContent = '已保存!';
+        saveButton.style.background = '#28a745';
+        
+        setTimeout(() => {
+            saveButton.textContent = originalText;
+        }, 1000);
+    }
+    
+    // 切换设置面板显示
+    function toggleSettings() {
+        const panel = document.getElementById('settingsPanel');
+        panel.classList.toggle('hidden');
+    }
+    
     // 自动启动应用
     function launchApp() {
         window.location.href = 'lightninglauncher://open';
         window.close();
     }
     
-    // 页面加载完成后自动启动
+    // 页面加载完成后执行
     window.addEventListener('load', function() {
-        launchApp();
+        // 加载用户设置
+        loadSettings();
+        
+        // 如果启用了自动启动，则延迟启动
+        if (settings.autoLaunch) {
+            setTimeout(function() {
+                launchApp();
+            }, settings.delayTime);
+        }
     });
     
     // 保留按钮点击功能作为备用
