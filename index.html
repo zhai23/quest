@@ -47,9 +47,20 @@
     </button>
 </body>
 <script>
-    document.querySelector('.launch-button').addEventListener('click', function() {
+    // 自动启动应用
+    function launchApp() {
         window.location.href = 'lightninglauncher://open';
         window.close();
+    }
+    
+    // 页面加载完成后自动启动
+    window.addEventListener('load', function() {
+        launchApp();
+    });
+    
+    // 保留按钮点击功能作为备用
+    document.querySelector('.launch-button').addEventListener('click', function() {
+        launchApp();
     });
 </script>
 </html>
