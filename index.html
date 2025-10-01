@@ -41,6 +41,15 @@
             box-shadow: 0 2px 4px rgba(0, 122, 204, 0.2);
         }
         
+        .auto-launch-button {
+            background-color: #28a745;
+            margin-top: 10px;
+        }
+        
+        .auto-launch-button:hover {
+            background-color: #218838;
+        }
+        
         .settings-panel {
             position: fixed;
             top: 20px;
@@ -115,12 +124,29 @@
         .save-button:hover {
             background: #218838;
         }
+        
+        .info-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
-    <button class="launch-button">
-        启动应用
-    </button>
+    <div>
+        <button class="launch-button" id="launchBtn">
+            启动应用
+        </button>
+        <button class="launch-button auto-launch-button" id="autoLaunchBtn">
+            自动启动 (点击后自动执行)
+        </button>
+        <div class="info-text">
+            在 Quest 3 上，请点击上方按钮启动应用<br>
+            自动启动功能在 Quest 3 上可能被浏览器阻止
+        </div>
+    </div>
     
     <button class="settings-toggle" onclick="toggleSettings()">
         设置
@@ -145,6 +171,12 @@
         delayTime: 500,
         autoLaunch: true
     };
+    
+    // 检测是否为 Quest 设备
+    function isQuestDevice() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        return userAgent.includes('quest') || userAgent.includes('oculus');
+    }
     
     // 从 localStorage 加载设置
     function loadSettings() {
@@ -179,10 +211,13 @@
         panel.classList.toggle('hidden');
     }
     
-    // 自动启动应用
+    // 启动应用
     function launchApp() {
         window.location.href = 'lightninglauncher://open';
-        window.close();
+        // 延迟关闭窗口，给启动器时间处理
+        setTimeout(() => {
+            window.close();
+        }, 1000);
     }
     
     // 页面加载完成后执行
@@ -190,17 +225,35 @@
         // 加载用户设置
         loadSettings();
         
-        // 如果启用了自动启动，则延迟启动
+        // 检测设备类型并调整界面
+        if (isQuestDevice()) {
+            // 在 Quest 设备上禁用自动启动，显示提示
+            document.getElementById('autoLaunch').checked = false;
+            document.querySelector('.info-text').style.display = 'block';
+        } else {
+            // 在非 Quest 设备上尝试自动启动
+            if (settings.autoLaunch) {
+                setTimeout(function() {
+                    launchApp();
+                }, settings.delayTime);
+            }
+        }
+    });
+    
+    // 手动启动按钮
+    document.getElementById('launchBtn').addEventListener('click', function() {
+        launchApp();
+    });
+    
+    // 自动启动按钮（模拟用户交互）
+    document.getElementById('autoLaunchBtn').addEventListener('click', function() {
         if (settings.autoLaunch) {
             setTimeout(function() {
                 launchApp();
             }, settings.delayTime);
+        } else {
+            launchApp();
         }
-    });
-    
-    // 保留按钮点击功能作为备用
-    document.querySelector('.launch-button').addEventListener('click', function() {
-        launchApp();
     });
 </script>
 </html>
