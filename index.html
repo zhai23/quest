@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>闪电启动器</title>
-    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="icon" href="icon.png">
     <style>
         body {
             margin: 0;
@@ -40,220 +40,17 @@
             transform: translateY(0);
             box-shadow: 0 2px 4px rgba(0, 122, 204, 0.2);
         }
-        
-        .auto-launch-button {
-            background-color: #28a745;
-            margin-top: 10px;
-        }
-        
-        .auto-launch-button:hover {
-            background-color: #218838;
-        }
-        
-        .settings-panel {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            min-width: 250px;
-            z-index: 1000;
-        }
-        
-        .settings-panel h3 {
-            margin: 0 0 15px 0;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        .setting-item {
-            margin-bottom: 15px;
-        }
-        
-        .setting-item label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .setting-item input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        
-        .settings-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #007acc;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            z-index: 1001;
-        }
-        
-        .settings-toggle:hover {
-            background: #005a9e;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .save-button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            width: 100%;
-        }
-        
-        .save-button:hover {
-            background: #218838;
-        }
-        
-        .info-text {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-            margin-top: 15px;
-            line-height: 1.4;
-        }
     </style>
 </head>
 <body>
-    <div>
-        <button class="launch-button" id="launchBtn">
-            启动应用
-        </button>
-        <button class="launch-button auto-launch-button" id="autoLaunchBtn">
-            自动启动 (点击后自动执行)
-        </button>
-        <div class="info-text">
-            在 Quest 3 上，请点击上方按钮启动应用<br>
-            自动启动功能在 Quest 3 上可能被浏览器阻止
-        </div>
-    </div>
-    
-    <button class="settings-toggle" onclick="toggleSettings()">
-        设置
+    <button class="launch-button">
+        启动应用
     </button>
-    
-    <div class="settings-panel hidden" id="settingsPanel">
-        <h3>启动设置</h3>
-        <div class="setting-item">
-            <label for="delayTime">自动启动延迟时间 (毫秒):</label>
-            <input type="number" id="delayTime" min="0" max="10000" step="100" value="500">
-        </div>
-        <div class="setting-item">
-            <label for="autoLaunch">启用自动启动:</label>
-            <input type="checkbox" id="autoLaunch" checked>
-        </div>
-        <button class="save-button" onclick="saveSettings()">保存设置</button>
-    </div>
 </body>
 <script>
-    // 默认设置
-    let settings = {
-        delayTime: 500,
-        autoLaunch: true
-    };
-    
-    // 检测是否为 Quest 设备
-    function isQuestDevice() {
-        const userAgent = navigator.userAgent.toLowerCase();
-        return userAgent.includes('quest') || userAgent.includes('oculus');
-    }
-    
-    // 从 localStorage 加载设置
-    function loadSettings() {
-        const savedSettings = localStorage.getItem('lightningLauncherSettings');
-        if (savedSettings) {
-            settings = JSON.parse(savedSettings);
-            document.getElementById('delayTime').value = settings.delayTime;
-            document.getElementById('autoLaunch').checked = settings.autoLaunch;
-        }
-    }
-    
-    // 保存设置到 localStorage
-    function saveSettings() {
-        settings.delayTime = parseInt(document.getElementById('delayTime').value);
-        settings.autoLaunch = document.getElementById('autoLaunch').checked;
-        localStorage.setItem('lightningLauncherSettings', JSON.stringify(settings));
-        
-        // 显示保存成功提示
-        const saveButton = document.querySelector('.save-button');
-        const originalText = saveButton.textContent;
-        saveButton.textContent = '已保存!';
-        saveButton.style.background = '#28a745';
-        
-        setTimeout(() => {
-            saveButton.textContent = originalText;
-        }, 1000);
-    }
-    
-    // 切换设置面板显示
-    function toggleSettings() {
-        const panel = document.getElementById('settingsPanel');
-        panel.classList.toggle('hidden');
-    }
-    
-    // 启动应用
-    function launchApp() {
+    document.querySelector('.launch-button').addEventListener('click', function() {
         window.location.href = 'lightninglauncher://open';
-        // 延迟关闭窗口，给启动器时间处理
-        setTimeout(() => {
-            window.close();
-        }, 1000);
-    }
-    
-    // 页面加载完成后执行
-    window.addEventListener('load', function() {
-        // 加载用户设置
-        loadSettings();
-        
-        // 检测设备类型并调整界面
-        if (isQuestDevice()) {
-            // 在 Quest 设备上禁用自动启动，显示提示
-            document.getElementById('autoLaunch').checked = false;
-            document.querySelector('.info-text').style.display = 'block';
-        } else {
-            // 在非 Quest 设备上尝试自动启动
-            if (settings.autoLaunch) {
-                setTimeout(function() {
-                    launchApp();
-                }, settings.delayTime);
-            }
-        }
-    });
-    
-    // 手动启动按钮
-    document.getElementById('launchBtn').addEventListener('click', function() {
-        launchApp();
-    });
-    
-    // 自动启动按钮（模拟用户交互）
-    document.getElementById('autoLaunchBtn').addEventListener('click', function() {
-        if (settings.autoLaunch) {
-            setTimeout(function() {
-                launchApp();
-            }, settings.delayTime);
-        } else {
-            launchApp();
-        }
+        window.close();
     });
 </script>
 </html>
