@@ -2,6 +2,7 @@
 
 当系统未知来源应用消失时
 通过网页启动第三方APP启动器
+启动器开源地址：https://github.com/zhai23/LightningLauncher
 
 ![截图](jietu.png)
 
